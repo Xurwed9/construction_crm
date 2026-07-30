@@ -29,9 +29,7 @@ class UserService:
         }
         return await user_repo.create(db, user_data)
 
-    async def update_user(
-        self, db: AsyncSession, user_id: uuid.UUID, data: UserUpdate
-    ) -> User:
+    async def update_user(self, db: AsyncSession, user_id: uuid.UUID, data: UserUpdate) -> User:
         user = await user_repo.get_by_id(db, user_id)
         if not user:
             raise NotFound("User not found")
@@ -68,17 +66,13 @@ class UserService:
             raise NotFound("User not found")
         return await user_repo.update(db, user, {"is_active": False})
 
-    async def change_role(
-        self, db: AsyncSession, user_id: uuid.UUID, role: UserRole
-    ) -> User:
+    async def change_role(self, db: AsyncSession, user_id: uuid.UUID, role: UserRole) -> User:
         user = await user_repo.get_by_id(db, user_id)
         if not user:
             raise NotFound("User not found")
         return await user_repo.update(db, user, {"role": role})
 
-    async def update_profile(
-        self, db: AsyncSession, user: User, data: UserUpdate
-    ) -> User:
+    async def update_profile(self, db: AsyncSession, user: User, data: UserUpdate) -> User:
         update_data = data.model_dump(exclude_unset=True)
 
         if "email" in update_data and update_data["email"] != user.email:
@@ -93,16 +87,12 @@ class UserService:
 
         return await user_repo.update(db, user, update_data)
 
-    async def change_password(
-        self, db: AsyncSession, user: User, current_password: str, new_password: str
-    ) -> User:
+    async def change_password(self, db: AsyncSession, user: User, current_password: str, new_password: str) -> User:
         from app.core.security import verify_password as check_pass
 
         if not check_pass(current_password, user.password_hash):
             raise Conflict("Current password is incorrect")
-        return await user_repo.update(
-            db, user, {"password_hash": hash_password(new_password)}
-        )
+        return await user_repo.update(db, user, {"password_hash": hash_password(new_password)})
 
     async def get_user(self, db: AsyncSession, user_id: uuid.UUID) -> User:
         user = await user_repo.get_by_id(db, user_id)
@@ -121,9 +111,7 @@ class UserService:
         search: str | None = None,
     ) -> tuple[list[User], int]:
         skip = (page - 1) * size
-        return await user_repo.list(
-            db, skip=skip, limit=size, role=role, is_active=is_active, search=search
-        )
+        return await user_repo.list(db, skip=skip, limit=size, role=role, is_active=is_active, search=search)
 
 
 user_service = UserService()

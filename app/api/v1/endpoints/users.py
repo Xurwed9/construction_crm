@@ -6,19 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.dependencies.auth import RoleChecker
 from app.models.user import User, UserRole
-from app.permissions.roles import (
-    check_can_change_role,
-    check_can_create_user,
-    check_can_manage_user,
-)
+from app.permissions.roles import check_can_change_role, check_can_create_user, check_can_manage_user
 from app.schemas.common import MessageResponse, PaginatedResponse
 from app.schemas.user import UserCreate, UserRead, UserShortRead, UserUpdate
 from app.services.user import user_service
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-admin_only = RoleChecker(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-super_admin_only = RoleChecker(UserRole.SUPER_ADMIN)
+admin_only = RoleChecker(UserRole.ADMIN)
+manager_read = RoleChecker(UserRole.ADMIN, UserRole.MANAGER)
 
 
 @router.get("/", response_model=PaginatedResponse[UserShortRead])
@@ -29,7 +25,7 @@ async def list_users(
     is_active: bool | None = None,
     search: str | None = Query(None, min_length=1),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(manager_read),
 ):
     users, total = await user_service.list_users(
         db, page=page, size=size, role=role, is_active=is_active, search=search
@@ -48,7 +44,7 @@ async def list_users(
 async def get_user(
     user_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(manager_read),
 ):
     return await user_service.get_user(db, user_id)
 
@@ -59,7 +55,7 @@ async def create_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(admin_only),
 ):
-    check_can_create_user(current_user, data.role)
+    check_can_create_user(current_user)
     return await user_service.create_user(db, data)
 
 
@@ -70,8 +66,7 @@ async def update_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(admin_only),
 ):
-    target = await user_service.get_user(db, user_id)
-    check_can_manage_user(current_user, target)
+    check_can_manage_user(current_user)
     return await user_service.update_user(db, user_id, data)
 
 
@@ -81,8 +76,7 @@ async def delete_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(admin_only),
 ):
-    target = await user_service.get_user(db, user_id)
-    check_can_manage_user(current_user, target)
+    check_can_manage_user(current_user)
     await user_service.delete_user(db, user_id)
     return MessageResponse(message="User deleted successfully")
 
@@ -93,8 +87,7 @@ async def activate_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(admin_only),
 ):
-    target = await user_service.get_user(db, user_id)
-    check_can_manage_user(current_user, target)
+    check_can_manage_user(current_user)
     return await user_service.activate_user(db, user_id)
 
 
@@ -104,8 +97,7 @@ async def deactivate_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(admin_only),
 ):
-    target = await user_service.get_user(db, user_id)
-    check_can_manage_user(current_user, target)
+    check_can_manage_user(current_user)
     return await user_service.deactivate_user(db, user_id)
 
 
@@ -114,8 +106,7 @@ async def change_role(
     user_id: uuid.UUID,
     new_role: UserRole,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(super_admin_only),
+    current_user: User = Depends(admin_only),
 ):
-    target = await user_service.get_user(db, user_id)
-    check_can_change_role(current_user, target, new_role)
+    check_can_change_role(current_user)
     return await user_service.change_role(db, user_id, new_role)

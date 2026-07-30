@@ -42,9 +42,7 @@ async def engine():
 
 @pytest_asyncio.fixture
 async def client(engine) -> AsyncGenerator[AsyncClient, None]:
-    session_factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async def override_get_db():
         async with session_factory() as session:
@@ -67,9 +65,7 @@ async def client(engine) -> AsyncGenerator[AsyncClient, None]:
 @pytest_asyncio.fixture
 async def admin_token(engine) -> str:
     uid = _next_id()
-    session_factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         user = User(
             first_name="Admin",
@@ -85,19 +81,17 @@ async def admin_token(engine) -> str:
 
 
 @pytest_asyncio.fixture
-async def super_admin_token(engine) -> str:
+async def manager_token(engine) -> str:
     uid = _next_id()
-    session_factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         user = User(
-            first_name="Super",
-            last_name=f"Admin{uid}",
-            email=f"super{uid}@test.com",
+            first_name="Manager",
+            last_name=f"User{uid}",
+            email=f"manager{uid}@test.com",
             phone=f"+9989012346{uid:02d}",
             password_hash=hash_password("StrongPass1"),
-            role=UserRole.SUPER_ADMIN,
+            role=UserRole.MANAGER,
         )
         session.add(user)
         await session.commit()
@@ -107,9 +101,7 @@ async def super_admin_token(engine) -> str:
 @pytest_asyncio.fixture
 async def client_token(engine) -> str:
     uid = _next_id()
-    session_factory = async_sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         user = User(
             first_name="Client",

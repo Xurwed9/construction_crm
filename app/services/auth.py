@@ -20,9 +20,7 @@ from app.schemas.auth import LoginRequest, RegisterRequest
 
 
 class AuthService:
-    async def register(
-        self, db: AsyncSession, data: RegisterRequest
-    ) -> tuple[str, str, User]:
+    async def register(self, db: AsyncSession, data: RegisterRequest) -> tuple[str, str, User]:
         existing_email = await user_repo.get_by_email(db, data.email)
         if existing_email:
             raise Conflict("Email already registered")
@@ -46,9 +44,7 @@ class AuthService:
 
         return access_token, refresh_token_str, user
 
-    async def login(
-        self, db: AsyncSession, data: LoginRequest
-    ) -> tuple[str, str, User]:
+    async def login(self, db: AsyncSession, data: LoginRequest) -> tuple[str, str, User]:
         user = await user_repo.get_by_email(db, data.email)
         if not user:
             raise Unauthorized("Invalid email or password")
@@ -128,9 +124,7 @@ class AuthService:
         db.add(token)
         return token_str
 
-    async def _get_valid_refresh_token(
-        self, db: AsyncSession, token_str: str
-    ) -> RefreshToken | None:
+    async def _get_valid_refresh_token(self, db: AsyncSession, token_str: str) -> RefreshToken | None:
         result = await db.execute(
             select(RefreshToken).where(
                 RefreshToken.token_hash == hash_token(token_str),

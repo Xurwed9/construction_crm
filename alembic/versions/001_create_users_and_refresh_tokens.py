@@ -28,16 +28,12 @@ def upgrade() -> None:
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column(
             "role",
-            sa.Enum("SUPER_ADMIN", "ADMIN", "MANAGER", "CLIENT", name="userrole"),
+            sa.Enum("ADMIN", "MANAGER", "CLIENT", name="userrole"),
             nullable=False,
             server_default="CLIENT",
         ),
-        sa.Column(
-            "is_active", sa.Boolean(), nullable=False, server_default=sa.text("true")
-        ),
-        sa.Column(
-            "is_verified", sa.Boolean(), nullable=False, server_default=sa.text("false")
-        ),
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("true")),
+        sa.Column("is_verified", sa.Boolean(), nullable=False, server_default=sa.text("false")),
         sa.Column("avatar", sa.String(500), nullable=True),
         sa.Column("last_login", sa.DateTime(timezone=True), nullable=True),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
@@ -65,9 +61,7 @@ def upgrade() -> None:
         sa.Column("user_id", sa.UUID(), nullable=False),
         sa.Column("token_hash", sa.String(255), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column(
-            "is_revoked", sa.Boolean(), nullable=False, server_default=sa.text("false")
-        ),
+        sa.Column("is_revoked", sa.Boolean(), nullable=False, server_default=sa.text("false")),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

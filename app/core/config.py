@@ -15,9 +15,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = True
 
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://user:password@localhost:5432/construction_crm"
-    )
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:123456@localhost:5432/construction_crm"
 
     SECRET_KEY: str = "change-me"
     ALGORITHM: str = "HS256"
@@ -31,6 +29,10 @@ class Settings(BaseSettings):
     MAX_AVATAR_SIZE_MB: int = 5
 
     LOG_LEVEL: str = "INFO"
+
+    @property
+    def is_sqlite(self) -> bool:
+        return self.DATABASE_URL.startswith("sqlite")
 
 
 settings = Settings()

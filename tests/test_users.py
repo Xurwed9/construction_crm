@@ -17,6 +17,15 @@ async def test_list_users_as_admin(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
+async def test_list_users_as_manager(client: AsyncClient, manager_token: str):
+    response = await client.get(
+        "/api/v1/users/",
+        headers={"Authorization": f"Bearer {manager_token}"},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_create_user_as_admin(client: AsyncClient, admin_token: str):
     payload = {
         "first_name": "New",
@@ -104,9 +113,7 @@ async def test_delete_user(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_change_role(
-    client: AsyncClient, super_admin_token: str, admin_token: str
-):
+async def test_change_role(client: AsyncClient, admin_token: str):
     target_payload = {
         "first_name": "Role",
         "last_name": "Change",
@@ -125,7 +132,7 @@ async def test_change_role(
     response = await client.patch(
         f"/api/v1/users/{target_id}/role",
         params={"new_role": "manager"},
-        headers={"Authorization": f"Bearer {super_admin_token}"},
+        headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 200
     assert response.json()["role"] == "manager"
