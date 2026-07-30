@@ -1,34 +1,32 @@
 from app.schemas.auth import (
-    ForgotPasswordRequest,
     LoginRequest,
     RefreshTokenRequest,
-    RegisterRequest,
-    ResetPasswordRequest,
     TokenResponse,
-    VerifyEmailRequest,
 )
 from app.schemas.common import MessageResponse, PaginatedResponse
 from app.schemas.user import (
     ChangePasswordRequest,
+    ResetPasswordResponse,
     UserCreate,
+    UserCreateResponse,
     UserRead,
+    UserRoleChangeRequest,
     UserShortRead,
     UserUpdate,
 )
 
 __all__ = [
     "ChangePasswordRequest",
-    "ForgotPasswordRequest",
     "LoginRequest",
     "MessageResponse",
     "PaginatedResponse",
     "RefreshTokenRequest",
-    "RegisterRequest",
-    "ResetPasswordRequest",
+    "ResetPasswordResponse",
     "TokenResponse",
     "UserCreate",
+    "UserCreateResponse",
     "UserRead",
+    "UserRoleChangeRequest",
     "UserShortRead",
     "UserUpdate",
-    "VerifyEmailRequest",
 ]

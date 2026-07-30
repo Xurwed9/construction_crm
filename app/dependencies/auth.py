@@ -3,9 +3,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import Unauthorized
+from app.core.exceptions import Forbidden, Unauthorized
 from app.core.security import decode_token
 from app.models.user import User, UserRole
+from app.permissions.roles import has_permission
 from app.services.auth import auth_service
 
 security_scheme = HTTPBearer()
@@ -33,5 +34,14 @@ class RoleChecker:
 
     async def __call__(self, current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in self.allowed_roles:
-            raise Unauthorized("Insufficient permissions")
+            raise Forbidden("Insufficient permissions")
         return current_user
+
+
+def require_permission(permission: str):
+    async def checker(current_user: User = Depends(get_current_user)) -> User:
+        if not has_permission(current_user, permission):
+            raise Forbidden("Insufficient permissions")
+        return current_user
+
+    return checker

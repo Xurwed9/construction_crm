@@ -1,16 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field
-
-
-class RegisterRequest(BaseModel):
-    first_name: str = Field(..., min_length=1, max_length=100)
-    last_name: str = Field(..., min_length=1, max_length=100)
-    email: EmailStr
-    phone: str = Field(..., min_length=7, max_length=20)
-    password: str = Field(..., min_length=8, max_length=128)
+from pydantic import BaseModel, Field
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    phone: str = Field(..., min_length=7, max_length=20)
     password: str
 
 
@@ -22,16 +14,3 @@ class TokenResponse(BaseModel):
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
-
-
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
-
-
-class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str = Field(..., min_length=8, max_length=128)
-
-
-class VerifyEmailRequest(BaseModel):
-    token: str

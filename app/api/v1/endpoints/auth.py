@@ -7,7 +7,6 @@ from app.models.user import User
 from app.schemas.auth import (
     LoginRequest,
     RefreshTokenRequest,
-    RegisterRequest,
     TokenResponse,
 )
 from app.schemas.common import MessageResponse
@@ -16,12 +15,6 @@ from app.services.auth import auth_service
 from app.services.user import user_service
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-
-
-@router.post("/register", response_model=TokenResponse, status_code=201)
-async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    access_token, refresh_token, _ = await auth_service.register(db, data)
-    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
 
 @router.post("/login", response_model=TokenResponse)

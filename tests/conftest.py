@@ -63,6 +63,24 @@ async def client(engine) -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest_asyncio.fixture
+async def super_admin_token(engine) -> str:
+    uid = _next_id()
+    session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with session_factory() as session:
+        user = User(
+            first_name="Super",
+            last_name=f"Admin{uid}",
+            email=f"superadmin{uid}@test.com",
+            phone=f"+9989012340{uid:02d}",
+            password_hash=hash_password("StrongPass1"),
+            role=UserRole.SUPER_ADMIN,
+        )
+        session.add(user)
+        await session.commit()
+        return create_access_token(str(user.id), user.role.value)
+
+
+@pytest_asyncio.fixture
 async def admin_token(engine) -> str:
     uid = _next_id()
     session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

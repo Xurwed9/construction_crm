@@ -11,8 +11,20 @@ class UserCreate(BaseModel):
     last_name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
     phone: str = Field(..., min_length=7, max_length=20)
-    password: str = Field(..., min_length=8, max_length=128)
     role: UserRole = UserRole.CLIENT
+
+
+class UserCreateResponse(BaseModel):
+    id: uuid.UUID
+    first_name: str
+    last_name: str
+    full_name: str
+    email: str
+    phone: str
+    role: UserRole
+    temporary_password: str
+
+    model_config = {"from_attributes": True}
 
 
 class UserUpdate(BaseModel):
@@ -52,4 +64,13 @@ class UserShortRead(BaseModel):
 
 class ChangePasswordRequest(BaseModel):
     current_password: str
-    new_password: str = Field(..., min_length=8, max_length=128)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+
+class UserRoleChangeRequest(BaseModel):
+    role: UserRole
+
+
+class ResetPasswordResponse(BaseModel):
+    id: uuid.UUID
+    temporary_password: str

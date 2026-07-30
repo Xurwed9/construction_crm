@@ -4,56 +4,31 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import Conflict, Forbidden, NotFound, Unauthorized
+from app.core.exceptions import Forbidden, NotFound, Unauthorized
 from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
-    hash_password,
     hash_token,
     verify_password,
 )
 from app.models.refresh_token import RefreshToken
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.repositories.user import user_repo
-from app.schemas.auth import LoginRequest, RegisterRequest
+from app.schemas.auth import LoginRequest
 
 
 class AuthService:
-    async def register(self, db: AsyncSession, data: RegisterRequest) -> tuple[str, str, User]:
-        existing_email = await user_repo.get_by_email(db, data.email)
-        if existing_email:
-            raise Conflict("Email already registered")
-
-        existing_phone = await user_repo.get_by_phone(db, data.phone)
-        if existing_phone:
-            raise Conflict("Phone already registered")
-
-        user_data = {
-            "first_name": data.first_name,
-            "last_name": data.last_name,
-            "email": data.email,
-            "phone": data.phone,
-            "password_hash": hash_password(data.password),
-            "role": UserRole.CLIENT,
-        }
-        user = await user_repo.create(db, user_data)
-
-        access_token = create_access_token(str(user.id), user.role.value)
-        refresh_token_str = self._store_refresh_token(db, user.id)
-
-        return access_token, refresh_token_str, user
-
     async def login(self, db: AsyncSession, data: LoginRequest) -> tuple[str, str, User]:
-        user = await user_repo.get_by_email(db, data.email)
+        user = await user_repo.get_by_phone(db, data.phone)
         if not user:
-            raise Unauthorized("Invalid email or password")
+            raise Unauthorized("Invalid phone or password")
 
         if not user.is_active:
             raise Forbidden("Account is deactivated")
 
         if not verify_password(data.password, user.password_hash):
-            raise Unauthorized("Invalid email or password")
+            raise Unauthorized("Invalid phone or password")
 
         user.last_login = datetime.now(timezone.utc)
         await db.flush()

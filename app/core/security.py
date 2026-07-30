@@ -1,4 +1,5 @@
 import hashlib
+import random
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -53,3 +54,7 @@ def decode_token(token: str) -> dict | None:
 
 def generate_random_token() -> str:
     return secrets.token_urlsafe(32)
+
+
+def generate_temporary_password() -> str:
+    return str(random.randint(100000, 999999))

@@ -4,17 +4,32 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.dependencies.auth import RoleChecker
+from app.dependencies.auth import RoleChecker, require_permission
 from app.models.user import User, UserRole
-from app.permissions.roles import check_can_change_role, check_can_create_user, check_can_manage_user
+from app.permissions.roles import (
+    USERS_VIEW,
+    require_can_change_role,
+    require_can_create_user,
+    require_can_delete_user,
+    require_can_manage_user,
+    require_can_reset_password,
+)
 from app.schemas.common import MessageResponse, PaginatedResponse
-from app.schemas.user import UserCreate, UserRead, UserShortRead, UserUpdate
+from app.schemas.user import (
+    ResetPasswordResponse,
+    UserCreate,
+    UserCreateResponse,
+    UserRead,
+    UserRoleChangeRequest,
+    UserShortRead,
+    UserUpdate,
+)
 from app.services.user import user_service
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-admin_only = RoleChecker(UserRole.ADMIN)
-manager_read = RoleChecker(UserRole.ADMIN, UserRole.MANAGER)
+admin_or_super = RoleChecker(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+manager_read = RoleChecker(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER)
 
 
 @router.get("/", response_model=PaginatedResponse[UserShortRead])
@@ -25,7 +40,7 @@ async def list_users(
     is_active: bool | None = None,
     search: str | None = Query(None, min_length=1),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(manager_read),
+    current_user: User = Depends(require_permission(USERS_VIEW)),
 ):
     users, total = await user_service.list_users(
         db, page=page, size=size, role=role, is_active=is_active, search=search
@@ -44,19 +59,29 @@ async def list_users(
 async def get_user(
     user_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(manager_read),
+    current_user: User = Depends(require_permission(USERS_VIEW)),
 ):
     return await user_service.get_user(db, user_id)
 
 
-@router.post("/", response_model=UserRead, status_code=201)
+@router.post("/", response_model=UserCreateResponse, status_code=201)
 async def create_user(
     data: UserCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_create_user(current_user)
-    return await user_service.create_user(db, data)
+    require_can_create_user(current_user, data.role)
+    user, temporary_password = await user_service.create_user(db, data)
+    return UserCreateResponse(
+        id=user.id,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        full_name=user.full_name,
+        email=user.email,
+        phone=user.phone,
+        role=user.role,
+        temporary_password=temporary_password,
+    )
 
 
 @router.patch("/{user_id}", response_model=UserRead)
@@ -64,9 +89,10 @@ async def update_user(
     user_id: uuid.UUID,
     data: UserUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_manage_user(current_user)
+    target = await user_service.get_user(db, user_id)
+    require_can_manage_user(current_user, target)
     return await user_service.update_user(db, user_id, data)
 
 
@@ -74,9 +100,10 @@ async def update_user(
 async def delete_user(
     user_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_manage_user(current_user)
+    target = await user_service.get_user(db, user_id)
+    require_can_delete_user(current_user, target)
     await user_service.delete_user(db, user_id)
     return MessageResponse(message="User deleted successfully")
 
@@ -85,9 +112,10 @@ async def delete_user(
 async def activate_user(
     user_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_manage_user(current_user)
+    target = await user_service.get_user(db, user_id)
+    require_can_manage_user(current_user, target)
     return await user_service.activate_user(db, user_id)
 
 
@@ -95,18 +123,35 @@ async def activate_user(
 async def deactivate_user(
     user_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_manage_user(current_user)
+    target = await user_service.get_user(db, user_id)
+    require_can_manage_user(current_user, target)
     return await user_service.deactivate_user(db, user_id)
 
 
 @router.patch("/{user_id}/role", response_model=UserRead)
 async def change_role(
     user_id: uuid.UUID,
-    new_role: UserRole,
+    data: UserRoleChangeRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(admin_only),
+    current_user: User = Depends(admin_or_super),
 ):
-    check_can_change_role(current_user)
-    return await user_service.change_role(db, user_id, new_role)
+    target = await user_service.get_user(db, user_id)
+    require_can_change_role(current_user, target, data.role)
+    return await user_service.change_role(db, user_id, data.role)
+
+
+@router.post("/{user_id}/reset-password", response_model=ResetPasswordResponse)
+async def reset_password(
+    user_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(admin_or_super),
+):
+    target = await user_service.get_user(db, user_id)
+    require_can_reset_password(current_user, target)
+    user, temporary_password = await user_service.reset_password(db, user_id)
+    return ResetPasswordResponse(
+        id=user.id,
+        temporary_password=temporary_password,
+    )
