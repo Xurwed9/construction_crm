@@ -17,32 +17,42 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    op.execute("ALTER TABLE users ALTER COLUMN role TYPE TEXT USING role::text")
+
+    op.execute("UPDATE users SET role = 'client' WHERE role IS NULL;")
+
     op.execute("ALTER TABLE users ALTER COLUMN role DROP DEFAULT")
     op.execute("ALTER TYPE userrole RENAME TO userrole_old")
     op.execute("CREATE TYPE userrole AS ENUM('super_admin', 'admin', 'manager', 'client')")
+
     op.execute(
         "ALTER TABLE users ALTER COLUMN role TYPE userrole "
-        "USING CASE role::text "
+        "USING CASE role "
+        "WHEN 'super_admin' THEN 'super_admin'::userrole "
         "WHEN 'admin' THEN 'admin'::userrole "
         "WHEN 'manager' THEN 'manager'::userrole "
         "WHEN 'client' THEN 'client'::userrole "
+        "ELSE 'client'::userrole "
         "END"
     )
+
     op.execute("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'client'")
     op.execute("DROP TYPE userrole_old")
 
 
 def downgrade() -> None:
+    op.execute("ALTER TABLE users ALTER COLUMN role TYPE TEXT USING role::text")
     op.execute("ALTER TABLE users ALTER COLUMN role DROP DEFAULT")
     op.execute("ALTER TYPE userrole RENAME TO userrole_old")
     op.execute("CREATE TYPE userrole AS ENUM('admin', 'manager', 'client')")
     op.execute(
         "ALTER TABLE users ALTER COLUMN role TYPE userrole "
-        "USING CASE role::text "
+        "USING CASE role "
         "WHEN 'super_admin' THEN 'admin'::userrole "
         "WHEN 'admin' THEN 'admin'::userrole "
         "WHEN 'manager' THEN 'manager'::userrole "
         "WHEN 'client' THEN 'client'::userrole "
+        "ELSE 'client'::userrole "
         "END"
     )
     op.execute("ALTER TABLE users ALTER COLUMN role SET DEFAULT 'client'")

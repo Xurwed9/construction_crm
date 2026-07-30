@@ -28,7 +28,11 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    status: Mapped[ProjectStatus] = mapped_column(Enum(ProjectStatus), default=ProjectStatus.ACTIVE, nullable=False)
+    status: Mapped[ProjectStatus] = mapped_column(
+        Enum(ProjectStatus, values_callable=lambda x: [e.value for e in x]),
+        default=ProjectStatus.ACTIVE,
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -106,7 +110,9 @@ class Apartment(Base):
     price: Mapped[float] = mapped_column(Float, nullable=False)
     currency: Mapped[str] = mapped_column(String(10), default="USD", nullable=False)
     status: Mapped[ApartmentStatus] = mapped_column(
-        Enum(ApartmentStatus), default=ApartmentStatus.AVAILABLE, nullable=False
+        Enum(ApartmentStatus, values_callable=lambda x: [e.value for e in x]),
+        default=ApartmentStatus.AVAILABLE,
+        nullable=False,
     )
     direction: Mapped[str | None] = mapped_column(String(50), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

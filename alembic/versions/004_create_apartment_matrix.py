@@ -27,9 +27,9 @@ def upgrade() -> None:
         sa.Column("address", sa.String(500), nullable=True),
         sa.Column(
             "status",
-            sa.Enum("ACTIVE", "ARCHIVED", name="projectstatus"),
+            sa.Enum("active", "archived", name="projectstatus"),
             nullable=False,
-            server_default="ACTIVE",
+            server_default="active",
         ),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
@@ -76,9 +76,9 @@ def upgrade() -> None:
         sa.Column("currency", sa.String(10), nullable=False, server_default=sa.text("'USD'")),
         sa.Column(
             "status",
-            sa.Enum("AVAILABLE", "RESERVED", "SOLD", "BLOCKED", name="apartmentstatus"),
+            sa.Enum("available", "reserved", "sold", "blocked", name="apartmentstatus"),
             nullable=False,
-            server_default="AVAILABLE",
+            server_default="available",
         ),
         sa.Column("direction", sa.String(50), nullable=True),
         sa.Column("description", sa.Text(), nullable=True),
@@ -97,5 +97,5 @@ def downgrade() -> None:
     op.drop_table("sections")
     op.drop_table("buildings")
     op.drop_table("projects")
-    op.execute("DROP TYPE projectstatus")
-    op.execute("DROP TYPE apartmentstatus")
+    op.execute("DROP TYPE IF EXISTS projectstatus")
+    op.execute("DROP TYPE IF EXISTS apartmentstatus")
