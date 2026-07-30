@@ -91,6 +91,14 @@ class UserService:
 
         temporary_password = generate_temporary_password()
         updated = await user_repo.update(db, user, {"password_hash": hash_password(temporary_password)})
+
+        await email_service.send_password_reset(
+            email=user.email,
+            first_name=user.first_name,
+            phone=user.phone,
+            temporary_password=temporary_password,
+        )
+
         return updated, temporary_password
 
     async def update_profile(self, db: AsyncSession, user: User, data: UserUpdate) -> User:

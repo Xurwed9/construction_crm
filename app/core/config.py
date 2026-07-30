@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads/avatars"
     MAX_AVATAR_SIZE_MB: int = 5
 
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""
+
     LOG_LEVEL: str = "INFO"
 
     @property
