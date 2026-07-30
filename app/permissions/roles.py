@@ -8,6 +8,12 @@ USERS_CHANGE_ROLE = "users.change_role"
 USERS_VIEW = "users.view"
 USERS_RESET_PASSWORD = "users.reset_password"
 
+MATRIX_CREATE = "matrix.create"
+MATRIX_UPDATE = "matrix.update"
+MATRIX_VIEW = "matrix.view"
+MATRIX_RESERVE = "matrix.reserve"
+MATRIX_DELETE = "matrix.delete"
+
 ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
     UserRole.SUPER_ADMIN: {
         USERS_CREATE,
@@ -16,6 +22,11 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         USERS_CHANGE_ROLE,
         USERS_VIEW,
         USERS_RESET_PASSWORD,
+        MATRIX_CREATE,
+        MATRIX_UPDATE,
+        MATRIX_VIEW,
+        MATRIX_RESERVE,
+        MATRIX_DELETE,
     },
     UserRole.ADMIN: {
         USERS_CREATE,
@@ -24,9 +35,16 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         USERS_CHANGE_ROLE,
         USERS_VIEW,
         USERS_RESET_PASSWORD,
+        MATRIX_CREATE,
+        MATRIX_UPDATE,
+        MATRIX_VIEW,
+        MATRIX_RESERVE,
+        MATRIX_DELETE,
     },
     UserRole.MANAGER: {
         USERS_VIEW,
+        MATRIX_VIEW,
+        MATRIX_RESERVE,
     },
     UserRole.CLIENT: set(),
 }
