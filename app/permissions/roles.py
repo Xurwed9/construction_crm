@@ -14,6 +14,14 @@ MATRIX_VIEW = "matrix.view"
 MATRIX_RESERVE = "matrix.reserve"
 MATRIX_DELETE = "matrix.delete"
 
+LEADS_CREATE = "leads.create"
+LEADS_VIEW = "leads.view"
+LEADS_UPDATE = "leads.update"
+LEADS_DELETE = "leads.delete"
+LEADS_MOVE = "leads.move"
+LEADS_ASSIGN = "leads.assign"
+LEADS_NOTES = "leads.notes"
+
 ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
     UserRole.SUPER_ADMIN: {
         USERS_CREATE,
@@ -27,6 +35,13 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         MATRIX_VIEW,
         MATRIX_RESERVE,
         MATRIX_DELETE,
+        LEADS_CREATE,
+        LEADS_VIEW,
+        LEADS_UPDATE,
+        LEADS_DELETE,
+        LEADS_MOVE,
+        LEADS_ASSIGN,
+        LEADS_NOTES,
     },
     UserRole.ADMIN: {
         USERS_CREATE,
@@ -40,11 +55,23 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         MATRIX_VIEW,
         MATRIX_RESERVE,
         MATRIX_DELETE,
+        LEADS_CREATE,
+        LEADS_VIEW,
+        LEADS_UPDATE,
+        LEADS_DELETE,
+        LEADS_MOVE,
+        LEADS_ASSIGN,
+        LEADS_NOTES,
     },
     UserRole.MANAGER: {
         USERS_VIEW,
         MATRIX_VIEW,
         MATRIX_RESERVE,
+        LEADS_CREATE,
+        LEADS_VIEW,
+        LEADS_UPDATE,
+        LEADS_MOVE,
+        LEADS_NOTES,
     },
     UserRole.CLIENT: set(),
 }
