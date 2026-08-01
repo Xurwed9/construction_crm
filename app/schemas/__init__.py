@@ -4,6 +4,22 @@ from app.schemas.auth import (
     TokenResponse,
 )
 from app.schemas.common import MessageResponse, PaginatedResponse
+from app.schemas.deal import (
+    DealCancelRequest,
+    DealCloseRequest,
+    DealCreate,
+    DealListResponse,
+    DealRead,
+    DealReserveRequest,
+    DealUpdate,
+)
+from app.schemas.deal_activity import DealActivityCreate, DealActivityRead, DealActivityUpdate
+from app.schemas.deal_dashboard import DashboardDeals
+from app.schemas.deal_document import DealDocumentCreate, DealDocumentRead
+from app.schemas.deal_payment import DealPaymentCreate, DealPaymentRead
+from app.schemas.deal_statistics import DealStatistics, ManagerPerformance
+from app.schemas.deal_task import DealTaskCreate, DealTaskRead, DealTaskUpdate
+from app.schemas.deal_timeline import DealTimelineRead
 from app.schemas.lead import (
     KanbanColumn,
     LeadAssignManagerRequest,
@@ -60,6 +76,26 @@ __all__ = [
     "BuildingRead",
     "BuildingStatistics",
     "ChangePasswordRequest",
+    "DashboardDeals",
+    "DealActivityCreate",
+    "DealActivityRead",
+    "DealActivityUpdate",
+    "DealCancelRequest",
+    "DealCloseRequest",
+    "DealCreate",
+    "DealDocumentCreate",
+    "DealDocumentRead",
+    "DealListResponse",
+    "DealPaymentCreate",
+    "DealPaymentRead",
+    "DealRead",
+    "DealReserveRequest",
+    "DealStatistics",
+    "DealTaskCreate",
+    "DealTaskRead",
+    "DealTaskUpdate",
+    "DealTimelineRead",
+    "DealUpdate",
     "FloorCreate",
     "FloorRead",
     "KanbanColumn",
@@ -75,6 +111,7 @@ __all__ = [
     "LeadTimelineRead",
     "LeadUpdate",
     "LoginRequest",
+    "ManagerPerformance",
     "MatrixApartment",
     "MatrixFloor",
     "MatrixResponse",

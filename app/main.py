@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.endpoints import auth, leads, matrix, users
+from app.api.v1.endpoints import auth, deals, leads, matrix, users
 from app.core.config import settings
 
 ALLOWED_ORIGINS = [
@@ -37,6 +37,11 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(matrix.router, prefix="/api/v1")
 app.include_router(leads.router, prefix="/api/v1")
+app.include_router(deals.router, prefix="/api/v1")
+app.include_router(deals.activities_router, prefix="/api/v1")
+app.include_router(deals.tasks_router, prefix="/api/v1")
+app.include_router(deals.documents_router, prefix="/api/v1")
+app.include_router(deals.dashboard_router, prefix="/api/v1")
 
 
 @app.get("/")

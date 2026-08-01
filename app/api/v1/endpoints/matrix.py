@@ -148,7 +148,7 @@ async def list_apartments(
     floor_number: int | None = Query(None),
     building_id: uuid.UUID | None = Query(None),
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(20, ge=1, le=500),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(MATRIX_VIEW)),
 ):
