@@ -22,6 +22,61 @@ LEADS_MOVE = "leads.move"
 LEADS_ASSIGN = "leads.assign"
 LEADS_NOTES = "leads.notes"
 
+DEALS_CREATE = "deals.create"
+DEALS_VIEW = "deals.view"
+DEALS_UPDATE = "deals.update"
+DEALS_DELETE = "deals.delete"
+DEALS_RESERVE = "deals.reserve"
+DEALS_CANCEL = "deals.cancel"
+DEALS_CLOSE = "deals.close"
+DEALS_RESTORE = "deals.restore"
+DEALS_TIMELINE = "deals.timeline"
+DEALS_ACTIVITIES = "deals.activities"
+DEALS_TASKS = "deals.tasks"
+DEALS_DOCUMENTS = "deals.documents"
+DEALS_PAYMENTS = "deals.payments"
+DEALS_STATISTICS = "deals.statistics"
+DEALS_DASHBOARD = "deals.dashboard"
+
+DEAL_PERMISSIONS: frozenset[str] = frozenset(
+    {
+        DEALS_CREATE,
+        DEALS_VIEW,
+        DEALS_UPDATE,
+        DEALS_DELETE,
+        DEALS_RESERVE,
+        DEALS_CANCEL,
+        DEALS_CLOSE,
+        DEALS_RESTORE,
+        DEALS_TIMELINE,
+        DEALS_ACTIVITIES,
+        DEALS_TASKS,
+        DEALS_DOCUMENTS,
+        DEALS_PAYMENTS,
+        DEALS_STATISTICS,
+        DEALS_DASHBOARD,
+    }
+)
+
+MANAGER_DEAL_PERMISSIONS: frozenset[str] = frozenset(
+    {
+        DEALS_CREATE,
+        DEALS_VIEW,
+        DEALS_UPDATE,
+        DEALS_RESERVE,
+        DEALS_CANCEL,
+        DEALS_CLOSE,
+        DEALS_RESTORE,
+        DEALS_TIMELINE,
+        DEALS_ACTIVITIES,
+        DEALS_TASKS,
+        DEALS_DOCUMENTS,
+        DEALS_PAYMENTS,
+        DEALS_STATISTICS,
+        DEALS_DASHBOARD,
+    }
+)
+
 ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
     UserRole.SUPER_ADMIN: {
         USERS_CREATE,
@@ -42,6 +97,7 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         LEADS_MOVE,
         LEADS_ASSIGN,
         LEADS_NOTES,
+        *DEAL_PERMISSIONS,
     },
     UserRole.ADMIN: {
         USERS_CREATE,
@@ -62,6 +118,7 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         LEADS_MOVE,
         LEADS_ASSIGN,
         LEADS_NOTES,
+        *DEAL_PERMISSIONS,
     },
     UserRole.MANAGER: {
         USERS_VIEW,
@@ -72,6 +129,7 @@ ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         LEADS_UPDATE,
         LEADS_MOVE,
         LEADS_NOTES,
+        *MANAGER_DEAL_PERMISSIONS,
     },
     UserRole.CLIENT: set(),
 }
