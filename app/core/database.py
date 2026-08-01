@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -12,7 +14,7 @@ async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_o
 
 
 class Base(DeclarativeBase):
-    pass
+    __mapper_args__: ClassVar[dict[str, object]] = {"eager_defaults": True}
 
 
 async def get_db() -> AsyncSession:
